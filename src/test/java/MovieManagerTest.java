@@ -1,46 +1,91 @@
-import org.example.MovieManager;
-import org.testng.annotations.Test;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-
-public class MovieManagerTest {
+class MovieManagerTest {
 
     @Test
-    public void testAddMovie() {
+    void shouldAddMovie() {
         MovieManager manager = new MovieManager();
-        manager.addMovie("Movie 1");
-        manager.addMovie("Movie 2");
-        String[] expected = {"Movie 1", "Movie 2"};
-        assertArrayEquals(expected, manager.findAll());
+        Movie movie = new Movie("Test Movie");
+        manager.add(movie);
+        Movie[] returned = manager.findAll();
+        Movie[] expected = {movie};
+
+        assertArrayEquals(expected, returned);
     }
 
     @Test
-    public void testFindAll() {
+    void shouldFindAllMovies() {
         MovieManager manager = new MovieManager();
-        String[] expected = {};
-        assertArrayEquals(expected, manager.findAll());
+        manager.add(new Movie("Movie 1"));
+        manager.add(new Movie("Movie 2"));
+        manager.add(new Movie("Movie 3"));
+        Movie[] returned = manager.findAll();
+        Movie[] expected = {
+            new Movie("Movie 1"),
+            new Movie("Movie 2"),
+            new Movie("Movie 3")
+        };
+
+        assertArrayEquals(expected, returned);
     }
 
     @Test
-    public void testFindLastDefaultLimit() {
-        MovieManager manager = new MovieManager();
-        manager.addMovie("Movie 1");
-        manager.addMovie("Movie 2");
-        manager.addMovie("Movie 3");
-        String[] expected = {"Movie 3", "Movie 2", "Movie 1"};
-        assertArrayEquals(expected, manager.findLast());
-    }
-
-    @Test
-    public void testFindLastCustomLimit() {
+    void shouldFindLastMovies() {
         MovieManager manager = new MovieManager(2);
-        manager.addMovie("Movie 1");
-        manager.addMovie("Movie 2");
-        manager.addMovie("Movie 3");
-        String[] expected = {"Movie 3", "Movie 2"};
-        assertArrayEquals(expected, manager.findLast());
+        manager.add(new Movie("Movie 1"));
+        manager.add(new Movie("Movie 2"));
+        manager.add(new Movie("Movie 3"));
+        Movie[] returned = manager.findLast();
+        Movie[] expected = {
+            new Movie("Movie 3"),
+            new Movie("Movie 2")
+        };
+
+        assertArrayEquals(expected, returned);
+    }
+
+    @Test
+    void shouldRespectDefaultLimit() {
+        MovieManager manager = new MovieManager();
+        manager.add(new Movie("Movie 1"));
+        manager.add(new Movie("Movie 2"));
+        manager.add(new Movie("Movie 3"));
+        manager.add(new Movie("Movie 4"));
+        manager.add(new Movie("Movie 5"));
+        manager.add(new Movie("Movie 6"));
+        Movie[] returned = manager.findLast();
+        Movie[] expected = {
+            new Movie("Movie 6"),
+            new Movie("Movie 5"),
+            new Movie("Movie 4"),
+            new Movie("Movie 3"),
+            new Movie("Movie 2")
+        };
+
+        assertArrayEquals(expected, returned);
     }
 }
+
+class Movie {
+    private String name;
+
+    public Movie(String name) {
+        this.name = name;
+    }
+
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Movie movie = (Movie) o;
+        return Objects.equals(name, movie.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+}
+
